@@ -4,6 +4,7 @@ const port = 3000;
 const mongoose = require("mongoose");
 const methodOverride = require("method-override");
 const path = require("path");
+const Listing = require("./models/listing.js");
 
 app.set("view engine","ejs");
 app.set("views",path.join(__dirname,"/views"));
@@ -24,7 +25,21 @@ async function main() {
 }
 
 app.get("/",(req,res) => {
-    
+    res.send("app is working and this is root");
+})
+
+app.get("/testListing",async(req,res) => {
+    let sampleListing = new Listing({
+        title: "My new Villa",
+        description: "By the Beach",
+        price: 1200,
+        location: "lucknow, UP",
+        Country: "India"
+    })
+
+    await sampleListing.save();
+    console.log("sample list is saved");
+    res.send("Successfully Testing");
 })
 
 app.listen(port,() =>{
