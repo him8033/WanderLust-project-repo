@@ -47,6 +47,18 @@ app.get("/listing",async (req,res) => {
     res.render("\listing/index.ejs",{allListing});
 })
 
+app.get("/listing/new",(req,res) => {
+    res.render("\listing/new.ejs");
+})
+
+app.post("/listing",async (req,res) => {
+    // let listing = req.body.listing;
+    // const newListing = new Listing(listing);         //      these commented line are same of just below line
+    const newListing = new Listing(req.body.listing);              //       nothing difference same working of above lines
+    newListing.save();
+    res.redirect("/listing");
+})
+
 app.get("/listing/:id",async (req,res) => {
     let {id} = req.params;
     let listing = await Listing.findById(id);
