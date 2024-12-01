@@ -5,12 +5,14 @@ const mongoose = require("mongoose");
 const methodOverride = require("method-override");
 const path = require("path");
 const Listing = require("./models/listing.js");
+const ejsMate = require("ejs-mate");
 
 app.set("view engine","ejs");
 app.set("views",path.join(__dirname,"/views"));
 app.use(express.static(path.join(__dirname,"public")));
 app.use(express.urlencoded({extended:true}));
 app.use(methodOverride("_method"));
+app.engine("ejs",ejsMate);
 
 main()
     .then(() => {
@@ -48,13 +50,13 @@ app.get("/",(req,res) => {
 
 app.get("/listing",async (req,res) => {
     const allListing = await Listing.find({});
-    res.render("\listing/index.ejs",{allListing});
+    res.render("listing/index.ejs",{allListing});
 })
 
 //      ************************        Add new Listing route
 
 app.get("/listing/new",(req,res) => {
-    res.render("\listing/new.ejs");
+    res.render("listing/new.ejs");
 })
 
 app.post("/listing",async (req,res) => {
@@ -70,7 +72,7 @@ app.post("/listing",async (req,res) => {
 app.get("/listing/:id",async (req,res) => {
     let {id} = req.params;
     let listing = await Listing.findById(id);
-    res.render("\listing/show.ejs",{listing});
+    res.render("listing/show.ejs",{listing});
 })
 
 //      ************************        Edit Route
