@@ -87,6 +87,15 @@ app.put("/listing/:id",async (req,res) => {
     res.redirect(`/listing/${id}`);
 })
 
+//      ************************        Delete Route
+
+app.delete("/listing/:id",async (req,res) => {
+    let {id} = req.params;
+    let deletedListing = await Listing.findByIdAndDelete(id);
+    console.log(deletedListing);
+    res.redirect("/listing");
+})
+
 app.listen(port,() =>{
     console.log("listening on port: ",port);
 })
