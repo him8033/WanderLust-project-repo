@@ -42,6 +42,11 @@ app.get("/testListing",async(req,res) => {
     res.send("Successfully Testing");
 })
 
+app.get("/listing",async (req,res) => {
+    const allListing = await Listing.find({});
+    res.render("\listing/index.ejs",{allListing});
+})
+
 app.listen(port,() =>{
     console.log("listening on port: ",port);
 })
