@@ -47,6 +47,12 @@ app.get("/listing",async (req,res) => {
     res.render("\listing/index.ejs",{allListing});
 })
 
+app.get("/listing/:id",async (req,res) => {
+    let {id} = req.params;
+    let listing = await Listing.findById(id);
+    res.render("\listing/show.ejs",{listing});
+})
+
 app.listen(port,() =>{
     console.log("listening on port: ",port);
 })
