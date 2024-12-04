@@ -7,12 +7,12 @@ const path = require("path");
 const Listing = require("./models/listing.js");
 const ejsMate = require("ejs-mate");
 
-app.set("view engine","ejs");
-app.set("views",path.join(__dirname,"/views"));
-app.use(express.static(path.join(__dirname,"public")));
-app.use(express.urlencoded({extended:true}));
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "/views"));
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
-app.engine("ejs",ejsMate);
+app.engine("ejs", ejsMate);
 
 main()
     .then(() => {
@@ -26,7 +26,7 @@ async function main() {
     await mongoose.connect("mongodb://127.0.0.1:27017/wanderlust")
 }
 
-app.get("/",(req,res) => {
+app.get("/", (req, res) => {
     res.send("app is working and this is root");
 })
 
@@ -48,56 +48,64 @@ app.get("/",(req,res) => {
 
 //      ************************        show all Listing route
 
-app.get("/listing",async (req,res) => {
+app.get("/listing", async (req, res) => {
     const allListing = await Listing.find({});
-    res.render("listing/index.ejs",{allListing});
+    res.render("listing/index.ejs", { allListing });
 })
 
 //      ************************        Add new Listing route
 
-app.get("/listing/new",(req,res) => {
+app.get("/listing/new", (req, res) => {
     res.render("listing/new.ejs");
 })
 
-app.post("/listing",async (req,res) => {
-    // let listing = req.body.listing;
-    // const newListing = new Listing(listing);         //      these commented line are same of just below line
-    const newListing = new Listing(req.body.listing);              //       nothing difference same working of above lines
-    newListing.save();
-    res.redirect("/listing");
+app.post("/listing", async (req, res, next) => {
+    try {
+        // let listing = req.body.listing;
+        // const newListing = new Listing(listing);         //      these commented line are same of just below line
+        const newListing = new Listing(req.body.listing);              //       nothing difference same working of above lines
+        await newListing.save();
+        res.redirect("/listing");
+    } catch (err) {
+        next(err);
+    }
 })
 
 //          ************************        Show Details of particular listing
 
-app.get("/listing/:id",async (req,res) => {
-    let {id} = req.params;
+app.get("/listing/:id", async (req, res) => {
+    let { id } = req.params;
     let listing = await Listing.findById(id);
-    res.render("listing/show.ejs",{listing});
+    res.render("listing/show.ejs", { listing });
 })
 
 //      ************************        Edit Route
 
-app.get("/listing/:id/edit",async (req,res) => {
-    let {id} = req.params;
+app.get("/listing/:id/edit", async (req, res) => {
+    let { id } = req.params;
     let listing = await Listing.findById(id);
-    res.render("listing/edit.ejs",{listing});
+    res.render("listing/edit.ejs", { listing });
 })
 
-app.put("/listing/:id",async (req,res) => {
-    let {id} = req.params;
-    await Listing.findByIdAndUpdate(id, {...req.body.listing});
+app.put("/listing/:id", async (req, res) => {
+    let { id } = req.params;
+    await Listing.findByIdAndUpdate(id, { ...req.body.listing });
     res.redirect(`/listing/${id}`);
 })
 
 //      ************************        Delete Route
 
-app.delete("/listing/:id",async (req,res) => {
-    let {id} = req.params;
+app.delete("/listing/:id", async (req, res) => {
+    let { id } = req.params;
     let deletedListing = await Listing.findByIdAndDelete(id);
     console.log(deletedListing);
     res.redirect("/listing");
 })
 
-app.listen(port,() =>{
-    console.log("listening on port: ",port);
+app.use((err, req, res, next) => {
+    res.send("Something Went Wrong!");
+})
+
+app.listen(port, () => {
+    console.log("listening on port: ", port);
 })
