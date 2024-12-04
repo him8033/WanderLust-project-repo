@@ -6,6 +6,7 @@ const methodOverride = require("method-override");
 const path = require("path");
 const Listing = require("./models/listing.js");
 const ejsMate = require("ejs-mate");
+const wrapAsync = require("./utils/wrapAsync.js");
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "/views"));
@@ -59,17 +60,13 @@ app.get("/listing/new", (req, res) => {
     res.render("listing/new.ejs");
 })
 
-app.post("/listing", async (req, res, next) => {
-    try {
-        // let listing = req.body.listing;
-        // const newListing = new Listing(listing);         //      these commented line are same of just below line
-        const newListing = new Listing(req.body.listing);              //       nothing difference same working of above lines
-        await newListing.save();
-        res.redirect("/listing");
-    } catch (err) {
-        next(err);
-    }
-})
+app.post("/listing", wrapAsync(async (req, res, next) => {
+    // let listing = req.body.listing;
+    // const newListing = new Listing(listing);         //      these commented line are same of just below line
+    const newListing = new Listing(req.body.listing);              //       nothing difference same working of above lines
+    await newListing.save();
+    res.redirect("/listing");
+}))
 
 //          ************************        Show Details of particular listing
 
