@@ -8,6 +8,7 @@ const Listing = require("./models/listing.js");
 const ejsMate = require("ejs-mate");
 const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError = require("./utils/ExpressError.js");
+const {listingSchema} = require("./Schema.js");
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "/views"));
@@ -62,9 +63,12 @@ app.get("/listing/new", (req, res) => {
 })
 
 app.post("/listing", wrapAsync(async (req, res, next) => {
-    if (!req.body.listing) {
-        throw new ExpressError(400, "Send Valid Data for Listing!");
+    let result = listingSchema.validate(req.body);
+    console.log(result);
+    if(result.error) {
+        throw new ExpressError(400,result.error);
     }
+
     // let listing = req.body.listing;
     // const newListing = new Listing(listing);         //      these commented line are same of just below line
     const newListing = new Listing(req.body.listing);              //       nothing difference same working of above lines but in a single line
