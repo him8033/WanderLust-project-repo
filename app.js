@@ -8,7 +8,7 @@ const Listing = require("./models/listing.js");
 const ejsMate = require("ejs-mate");
 const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError = require("./utils/ExpressError.js");
-const {listingSchema} = require("./Schema.js");
+const { listingSchema } = require("./Schema.js");
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "/views"));
@@ -49,6 +49,18 @@ app.get("/", (req, res) => {
 //     res.send("Successfully Testing");
 // })
 
+//      Define ServerSide Schema Validation Function 
+
+const validateListing = (req, res, next) => {
+    let {error} = listingSchema.validate(req.body);
+    if (error) {
+        let errMsg = error.details.map((el) => el.message).join(",");
+        throw new ExpressError(400, errMsg);
+    } else {
+        next();
+    }
+}
+
 //      ************************        show all Listing route
 
 app.get("/listing", wrapAsync(async (req, res) => {
@@ -62,13 +74,7 @@ app.get("/listing/new", (req, res) => {
     res.render("listing/new.ejs");
 })
 
-app.post("/listing", wrapAsync(async (req, res, next) => {
-    let result = listingSchema.validate(req.body);
-    console.log(result);
-    if(result.error) {
-        throw new ExpressError(400,result.error);
-    }
-
+app.post("/listing", validateListing, wrapAsync(async (req, res, next) => {
     // let listing = req.body.listing;
     // const newListing = new Listing(listing);         //      these commented line are same of just below line
     const newListing = new Listing(req.body.listing);              //       nothing difference same working of above lines but in a single line
@@ -92,10 +98,7 @@ app.get("/listing/:id/edit", wrapAsync(async (req, res) => {
     res.render("listing/edit.ejs", { listing });
 }))
 
-app.put("/listing/:id", wrapAsync(async (req, res) => {
-    if (!req.body.listing) {
-        throw new ExpressError(400, "Send Valid Data for Listing!");
-    }
+app.put("/listing/:id", validateListing, wrapAsync(async (req, res) => {
     let { id } = req.params;
     await Listing.findByIdAndUpdate(id, { ...req.body.listing });
     res.redirect(`/listing/${id}`);
@@ -116,7 +119,7 @@ app.all("*", (req, res, next) => {
 
 app.use((err, req, res, next) => {
     let { statusCode = 500, message = "Something Went Wrong!" } = err;
-    res.status(statusCode).render("listing/errors.ejs",{err});
+    res.status(statusCode).render("listing/errors.ejs", { err });
 })
 
 app.listen(port, () => {
