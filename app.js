@@ -97,7 +97,7 @@ app.post("/listing", validateListing, wrapAsync(async (req, res, next) => {
 
 app.get("/listing/:id", wrapAsync(async (req, res) => {
     let { id } = req.params;
-    let listing = await Listing.findById(id);
+    let listing = await Listing.findById(id).populate("reviews");
     res.render("listing/show.ejs", { listing });
 }))
 
