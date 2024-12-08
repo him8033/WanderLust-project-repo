@@ -4,19 +4,25 @@ const user = require("./routes/user.js");
 const post = require("./routes/post.js");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
+const flash = require("connect-flash");
+const path = require("path");
 
 app.use(cookieParser("secretcode"));
 const sessionOption = { secret: "mysupersecretstring", resave: false, saveUninitialized: true };
 app.use(session(sessionOption));
+app.use(flash());
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "/views"));
 
 app.get("/register", (req,res)=>{
     let { name= "anonymous" } = req.query;
     req.session.name = name;
+    req.flash("success","user registerd successfully");
     res.redirect("/hello");
 })
 
 app.get("/hello", (req,res)=>{
-    res.send(`hello, ${req.session.name}`);
+    res.render("page.ejs",{name: req.session.name, msg: req.flash("success")})
 })
 
 app.get("/rqcount", (req, res) => {
