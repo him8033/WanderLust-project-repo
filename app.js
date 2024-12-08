@@ -33,7 +33,12 @@ async function main() {
 const sessionOption = {
     secret: "mysupersecretstring",
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: true,
+    cookie: {
+        expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        httpOnly: true
+    }
 }
 
 app.use(session(sessionOption));
