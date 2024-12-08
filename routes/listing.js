@@ -43,6 +43,7 @@ router.post("/", validateListing, wrapAsync(async (req, res, next) => {
     // const newListing = new Listing(listing);         //      these commented line are same of just below line
     const newListing = new Listing(req.body.listing);              //       nothing difference same working of above lines but in a single line
     await newListing.save();
+    req.flash("success","New Listing Created");
     res.redirect("/listing");
 }))
 

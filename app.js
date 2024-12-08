@@ -7,6 +7,7 @@ const path = require("path");
 const ejsMate = require("ejs-mate");
 const ExpressError = require("./utils/ExpressError.js");
 const session = require("express-session");
+const flash = require("connect-flash");
 
 const listing = require("./routes/listing.js");
 const review = require("./routes/review.js");
@@ -41,10 +42,16 @@ const sessionOption = {
     }
 }
 
-app.use(session(sessionOption));
-
 app.get("/", (req, res) => {
     res.send("app is working and this is root");
+})
+
+app.use(session(sessionOption));
+app.use(flash());
+
+app.use((req,res,next) => {
+    res.locals.success = req.flash("success");
+    next();
 })
 
 app.use("/listing", listing);
