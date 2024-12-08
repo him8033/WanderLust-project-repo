@@ -6,7 +6,18 @@ const cookieParser = require("cookie-parser");
 const session = require("express-session");
 
 app.use(cookieParser("secretcode"));
-app.use(session({ secret: "mysupersecretstring", resave: false, saveUninitialized: true }));
+const sessionOption = { secret: "mysupersecretstring", resave: false, saveUninitialized: true };
+app.use(session(sessionOption));
+
+app.get("/register", (req,res)=>{
+    let { name= "anonymous" } = req.query;
+    req.session.name = name;
+    res.redirect("/hello");
+})
+
+app.get("/hello", (req,res)=>{
+    res.send(`hello, ${req.session.name}`);
+})
 
 app.get("/rqcount", (req, res) => {
     if (req.session.count) {
