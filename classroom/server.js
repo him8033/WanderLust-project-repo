@@ -4,6 +4,12 @@ const app = express();
 const user = require("./routes/user.js");
 const post = require("./routes/post.js");
 
+app.get("/getcookies",(req,res) => {
+    res.cookie("greet","Namaste");
+    res.cookie("made-In","India");
+    res.send("Sent You some cookies");
+})
+
 app.get("/",(req,res) => {
     res.send("This is Route");
 })
