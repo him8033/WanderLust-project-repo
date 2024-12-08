@@ -6,9 +6,18 @@ const cookieParser = require("cookie-parser");
 const session = require("express-session");
 
 app.use(cookieParser("secretcode"));
-app.use(session({ secret: "mysupersecretstring" }));
+app.use(session({ secret: "mysupersecretstring", resave: false, saveUninitialized: true }));
 
-app.get("/test",(req,res) => {
+app.get("/rqcount", (req, res) => {
+    if (req.session.count) {
+        req.session.count++;
+    } else {
+        req.session.count = 1;
+    }
+    res.send(`You sent a request ${req.session.count} times`);
+})
+
+app.get("/test", (req, res) => {
     res.send("test Successful");
 })
 
