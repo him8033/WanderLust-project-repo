@@ -12,8 +12,9 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user.js");
 
-const listing = require("./routes/listing.js");
-const review = require("./routes/review.js");
+const listingRouter = require("./routes/listing.js");
+const reviewRouter = require("./routes/review.js");
+const userRouter = require("./routes/user.js");
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "/views"));
@@ -75,9 +76,9 @@ app.get("/demouser",async (req,res) => {
     res.send(registeredUser);
 })
 
-app.use("/listing", listing);
-app.use("/listing/:id/reviews", review);
-
+app.use("/listing", listingRouter);
+app.use("/listing/:id/reviews", reviewRouter);
+app.use("/", userRouter);
 
 app.all("*", (req, res, next) => {
     next(new ExpressError(404, "Page Not Found!"));
