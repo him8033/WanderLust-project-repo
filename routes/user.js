@@ -31,4 +31,14 @@ router.post("/login", passport.authenticate("local", { failureRedirect: "/login"
     res.redirect("/listing");
 }))
 
+router.get("/logout",(req,res,next) => {
+    req.logOut((err) => {
+        if(err){
+            next();
+        }
+        req.flash("success","You are Logged Out!");
+        res.redirect("/listing");
+    })
+})
+
 module.exports = router;
