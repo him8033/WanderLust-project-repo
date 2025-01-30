@@ -1,4 +1,4 @@
-if(process.env.NODE_ENV != "production"){
+if (process.env.NODE_ENV != "production") {
     require("dotenv").config();
 }
 
@@ -28,9 +28,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.engine("ejs", ejsMate);
 
-    const MongoUrl = "mongodb://127.0.0.1:27017/wanderlust";
-    const dbUrl = process.env.ATLASDB_URL;
-
+const MongoUrl = "mongodb://127.0.0.1:27017/wanderlust";
+const dbUrl = process.env.ATLASDB_URL;
+console.log(dbUrl)
 main()
     .then(() => {
         console.log("Mongoose Connected");
@@ -40,11 +40,11 @@ main()
     })
 
 async function main() {
-    await mongoose.connect(MongoUrl);
+    await mongoose.connect(dbUrl);
 }
 
 const store = MongoStore.create({
-    mongoUrl: MongoUrl,
+    mongoUrl: dbUrl,
     crypto: {
         secret: process.env.SECRET,
     },
@@ -81,14 +81,14 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-app.use((req,res,next) => {
+app.use((req, res, next) => {
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
     res.locals.currUser = req.user;
     next();
 })
 
-app.get("/demouser",async (req,res) => {
+app.get("/demouser", async (req, res) => {
     let fakeUser = new User({
         email: "student@gmail.com",
         username: "delta-student"
