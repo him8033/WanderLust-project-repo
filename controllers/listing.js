@@ -63,18 +63,33 @@ module.exports.renderEditForm = async (req, res) => {
 }
 
 module.exports.updateListing = async (req, res) => {
-    let { id } = req.params;
-    let listing = await Listing.findByIdAndUpdate(id, { ...req.body.listing });
+    try {
+        let GeoUrl = `https://nominatim.openstreetmap.org/search?q=${req.body.listing.location}&format=json`;
+        let result = await fetch(GeoUrl);
+        let data = await result.json();
+        
+            let { id } = req.params;
+            let listing = await Listing.findByIdAndUpdate(id, { ...req.body.listing });
+            await listing.save();
+            
+            if (typeof req.file !== "undefined") {
+                let url = req.file.path;
+                let filename = req.file.filename;
+                listing.image = { url, filename };
+            }
+            if (data.length > 0) {
+                let lat = data[0].lat;
+                let lon = data[0].lon;
+                listing.geometry = { type: "Point", coordinates: [lat, lon] };
+            }
 
-    if (typeof req.file !== "undefined") {
-        let url = req.file.path;
-        let filename = req.file.filename;
-        listing.image = { url, filename };
-        await listing.save();
+            await listing.save();
+            req.flash("success", "Listing Updated");
+            res.redirect(`/listing/${id}`);
+    } catch (err) {
+        req.flash("error", err.message);
+        res.redirect(`/listing/${id}`);
     }
-
-    req.flash("success", "Listing Updated");
-    res.redirect(`/listing/${id}`);
 }
 
 module.exports.destroyListing = async (req, res) => {
