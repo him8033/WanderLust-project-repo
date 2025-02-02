@@ -20,16 +20,34 @@ module.exports.showListing = async (req, res) => {
 }
 
 module.exports.createListing = async (req, res, next) => {
-    let url = req.file.path;
-    let filename = req.file.filename;
-    // let listing = req.body.listing;
-    // const newListing = new Listing(listing);         //      these commented line are same of just below line
-    const newListing = new Listing(req.body.listing);              //       nothing difference same working of above lines but in a single line
-    newListing.owner = req.user._id;
-    newListing.image = {url, filename};
-    await newListing.save();
-    req.flash("success", "New Listing Created");
-    res.redirect("/listing");
+    try {
+        let GeoUrl = `https://nominatim.openstreetmap.org/search?q=${req.body.listing.location}&format=json`;
+        let result = await fetch(GeoUrl);
+        let data = await result.json();
+        if (data.length > 0) {
+            let lat = data[0].lat;
+            let lon = data[0].lon;
+
+            let url = req.file.path;
+            let filename = req.file.filename;
+            // let listing = req.body.listing;
+            // const newListing = new Listing(listing);         //      these commented line are same of just below line
+            const newListing = new Listing(req.body.listing);              //       nothing difference same working of above lines but in a single line
+            newListing.owner = req.user._id;
+            newListing.image = { url, filename };
+            newListing.geometry = { type: "Point", coordinates: [lon, lat] };
+            await newListing.save();
+            req.flash("success", "New Listing Created");
+            res.redirect("/listing");
+        } else {
+            console.log("No location found.");
+            req.flash("error", "Invalid location.");
+            res.redirect("/listing/new");
+        }
+    } catch (err) {
+        req.flash("error", err.message);
+        res.redirect("/listing/new");
+    }
 }
 
 module.exports.renderEditForm = async (req, res) => {
@@ -48,7 +66,7 @@ module.exports.updateListing = async (req, res) => {
     let { id } = req.params;
     let listing = await Listing.findByIdAndUpdate(id, { ...req.body.listing });
 
-    if(typeof req.file !== "undefined"){
+    if (typeof req.file !== "undefined") {
         let url = req.file.path;
         let filename = req.file.filename;
         listing.image = { url, filename };
