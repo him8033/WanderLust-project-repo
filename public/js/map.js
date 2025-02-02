@@ -1,14 +1,9 @@
-	// mapboxgl.accessToken = mapToken;
-    // const map = new mapboxgl.Map({
-    //     container: 'map', // container ID
-    //     style: "mapbox://styles/mapbox/streets-v12",
-    //     center: [-74.5, 40], // starting position [lng, lat]. Note that lat must be set between -90 and 90
-    //     zoom: 9 // starting zoom
-    // });
+const map = L.map('map').setView(listing.geometry.coordinates, 10); // दिल्ली के लिए Coordinates
 
-    var map = L.map('map').setView([28.6139, 77.2090], 13); // दिल्ली के लिए Coordinates
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; Wanderlust'
+}).addTo(map);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; Wanderlust'
-    }).addTo(map);
-    
+const marker = L.marker(listing.geometry.coordinates).addTo(map) // [Latitude, Longitude]
+  .bindPopup(`<b>${listing.title}</b><br>${listing.location}`) // Add a popup
+  .openPopup();
