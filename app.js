@@ -67,10 +67,6 @@ const sessionOption = {
     }
 }
 
-// app.get("/", (req, res) => {
-//     res.send("app is working and this is root");
-// })
-
 app.use(session(sessionOption));
 app.use(flash());
 
@@ -96,6 +92,10 @@ app.get("/demouser", async (req, res) => {
 
     let registeredUser = await User.register(fakeUser, "helloworld");
     res.send(registeredUser);
+})
+
+app.get("/", (req, res) => {
+    res.redirect("/listing");
 })
 
 app.use("/listing", listingRouter);
